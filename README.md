@@ -1,8 +1,18 @@
 # MC Launcher
 
-一个开源的 Minecraft: Java 版启动器，基于 [Tauri 2](https://tauri.app/)（Rust 后端）+ React + TypeScript。
+[![CI](https://github.com/xukan5764-ai/minecraft-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/xukan5764-ai/minecraft-launcher/actions/workflows/ci.yml)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
-> 目前是雏形阶段，功能可用但还很粗糙，欢迎一起完善。
+一个开源的 Minecraft: Java 版启动器，基于 [Tauri 2](https://tauri.app/)（Rust 后端）+ React + TypeScript。体积小、跨平台（Windows / macOS / Linux）。
+
+> 目前是雏形阶段，功能可用但还很粗糙，欢迎提 Issue 和 PR 一起完善。
+
+<p align="center">
+  <img src="docs/screenshots/home.png" alt="启动页" width="720" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/versions.png" alt="版本管理" width="720" />
+</p>
 
 ## 功能
 
@@ -12,6 +22,10 @@
 - **账号**：微软正版登录（设备码方式），以及离线账号
 - **启动**：校验并补全游戏文件、库和资源后启动，实时显示游戏日志，可以结束游戏进程
 - **模组**：搜索 CurseForge 模组，自动选择匹配游戏版本和加载器的文件，并安装必需的前置模组
+
+## 下载
+
+预编译的安装包会发布在 [Releases](https://github.com/xukan5764-ai/minecraft-launcher/releases) 页面。还没有发布版本时，请按下面的步骤自行编译。
 
 ## 开发环境
 
@@ -56,8 +70,10 @@ cargo test
 
 ### 微软 Client ID
 
+**请使用你自己注册的 Client ID。** 不要使用其他启动器（如 PCL2、HMCL）的 Client ID：登录完成页显示的是 Client ID 对应的应用名（例如“你已成功登录到 PCL2”），用别人的 ID 会让用户误以为在登录别的软件，也可能违反对方和微软的使用条款。
+
 1. 打开 [Azure 门户 → 应用注册](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)，点“新注册”
-2. “受支持的帐户类型”选择 **仅限个人 Microsoft 帐户**，重定向 URI 留空
+2. “名称”填写你的启动器名字（登录完成页会显示它，例如 `MC Launcher`），“受支持的帐户类型”选择 **仅限个人 Microsoft 帐户**，重定向 URI 留空
 3. 创建后进入“身份验证”，把 **允许公共客户端流** 设为“是”并保存（设备码登录需要这一项）
 4. 复制“概述”页的 **应用程序(客户端) ID**，填到 `MS_CLIENT_ID`
 5. **向 Mojang 申请 Minecraft API 权限**：新注册的应用默认不能调用 Minecraft 登录接口，需要提交 [申请表单](https://aka.ms/mce-reviewappid)。审核通过前，登录到最后一步会提示 “Invalid app registration”。
@@ -68,9 +84,10 @@ cargo test
 
 ### GitHub Actions
 
-`.github/workflows/ci.yml` 会在每次推送和 PR 时运行前端构建、`cargo fmt`、`clippy` 和单元测试。
+- `ci.yml`：每次推送到 `main` 和每个 PR 都会运行前端构建、`cargo fmt`、`clippy` 和单元测试；也可以在 Actions 页手动运行，顺带构建三个平台的安装包（作为 Artifact 下载）。
+- `release.yml`：推送 `v*` 标签（如 `v0.1.0`）时，在 Windows、macOS、Linux 上打包，并创建一个草稿 Release，确认无误后在网页上点发布。
 
-各平台安装包只在手动触发时构建（Actions → CI → Run workflow），这样可以节省私有仓库的 Actions 额度。构建时会从仓库 Secrets 读取 `MS_CLIENT_ID` 和 `CURSEFORGE_API_KEY`，在 Settings → Secrets and variables → Actions 里添加即可。
+打包时会从仓库 Secrets 读取 `MS_CLIENT_ID` 和 `CURSEFORGE_API_KEY`（Settings → Secrets and variables → Actions）。来自 fork 的 PR 拿不到这些 Secrets。
 
 ## 项目结构
 
@@ -105,6 +122,10 @@ src-tauri/              后端（Rust）
 - [ ] 国内下载镜像（如 BMCLAPI），可在设置中切换
 - [ ] 账号令牌存入系统钥匙串（目前保存在数据目录的 `accounts.json`，Unix 上权限为 600）
 - [ ] 多语言、皮肤预览、启动器自动更新
+
+## 参与贡献
+
+欢迎提交 Issue 和 Pull Request，开发约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ## 许可证
 

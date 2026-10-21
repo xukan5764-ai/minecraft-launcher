@@ -38,8 +38,8 @@ jobs:
       - run: cargo test
         working-directory: src-tauri
 
-  # Full installers for every OS. Only runs on demand (Actions tab → CI → Run workflow),
-  # because macOS minutes count 10x against the private-repo quota.
+  # Installers for every OS, uploaded as artifacts. Only on demand (Actions → CI → Run workflow);
+  # tagged releases are built by release.yml.
   build:
     name: Build (${{ matrix.platform }})
     if: github.event_name == 'workflow_dispatch'

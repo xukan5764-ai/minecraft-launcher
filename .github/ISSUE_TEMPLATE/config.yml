@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全问题
+    url: https://github.com/xukan5764-ai/minecraft-launcher/security/advisories/new
+    about: 涉及账号令牌、远程代码执行等安全问题，请私下报告，不要公开提 Issue。

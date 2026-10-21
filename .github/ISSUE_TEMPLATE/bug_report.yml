@@ -1,0 +1,34 @@
+name: 问题反馈
+description: 启动器出错、崩溃或行为不符合预期
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 你做了什么操作，期望发生什么，实际发生了什么。
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: 报错信息或日志
+      description: 界面上的红色报错，或“启动”页的日志。请先删掉其中的令牌等敏感信息。
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: 启动器版本
+      placeholder: 例如 0.1.0，或 commit 哈希
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: input
+    id: game
+    attributes:
+      label: 游戏版本 / 加载器
+      placeholder: 例如 1.20.1 + Fabric 0.16.9
