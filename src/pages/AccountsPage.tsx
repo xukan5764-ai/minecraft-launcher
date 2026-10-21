@@ -86,6 +86,10 @@ export default function AccountsPage() {
                 取消
               </button>
             </div>
+            <p className="muted small">
+              浏览器会自动使用已登录的微软账号。如果那不是购买了 Minecraft 的账号，请把登录地址{" "}
+              <code>{deviceCode.verificationUri}</code> 复制到无痕/InPrivate 窗口中打开。
+            </p>
             <p className="muted small">正在等待你在浏览器中完成登录...</p>
           </div>
         ) : (

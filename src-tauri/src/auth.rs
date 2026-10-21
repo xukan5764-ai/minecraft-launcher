@@ -213,6 +213,8 @@ struct Xui {
 #[serde(rename_all = "PascalCase")]
 struct XstsError {
     x_err: u64,
+    /// Page where the user can fix the problem, e.g. create an Xbox profile.
+    redirect: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -367,12 +369,11 @@ async fn login_minecraft(client: &reqwest::Client, tokens: MsTokens) -> Result<A
         .send()
         .await?;
     if resp.status() == reqwest::StatusCode::UNAUTHORIZED {
-        let code = resp
-            .json::<XstsError>()
-            .await
-            .map(|e| e.x_err)
-            .unwrap_or_default();
-        bail!(xsts_error_message(code));
+        let err = resp.json::<XstsError>().await.unwrap_or(XstsError {
+            x_err: 0,
+            redirect: None,
+        });
+        bail!(xsts_error_message(&err));
     }
     let xsts: XboxToken = resp
         .error_for_status()
@@ -422,9 +423,16 @@ async fn login_minecraft(client: &reqwest::Client, tokens: MsTokens) -> Result<A
     })
 }
 
-fn xsts_error_message(code: u64) -> String {
+fn xsts_error_message(err: &XstsError) -> String {
+    let code = err.x_err;
     match code {
-        2148916233 => "这个微软账号还没有 Xbox 档案，请先登录 xbox.com 创建".into(),
+        2148916233 => format!(
+            "Xbox 返回 {code}：这次登录的微软账号没有 Xbox 档案。\n\
+             最常见的原因是浏览器自动用了另一个已登录的微软账号。请重新点“使用微软账号登录”，\
+             在无痕/InPrivate 窗口打开登录页，手动登录购买了 Minecraft 的那个账号。\n\
+             如果确认是这个账号，请用它打开 {} 创建 Xbox 档案后再试。",
+            err.redirect.as_deref().unwrap_or("https://www.xbox.com/")
+        ),
         2148916235 => "Xbox Live 在你所在的国家/地区不可用".into(),
         2148916236 | 2148916237 => "该账号需要在 Xbox 网站完成成人验证".into(),
         2148916238 => "未成年账号需要由家长加入 Microsoft 家庭组后才能登录".into(),
@@ -440,6 +448,17 @@ mod tests {
     fn offline_uuid_matches_java() {
         // Java: UUID.nameUUIDFromBytes("OfflinePlayer:Notch".getBytes(UTF_8))
         assert_eq!(offline_uuid("Notch"), "b50ad385829d3141a2167e7d7539ba7f");
+    }
+
+    #[test]
+    fn xsts_no_profile_message() {
+        let err: XstsError = serde_json::from_str(
+            r#"{"Identity":"0","XErr":2148916233,"Message":"","Redirect":"https://start.ui.xboxlive.com/CreateAccount"}"#,
+        )
+        .unwrap();
+        let message = xsts_error_message(&err);
+        assert!(message.contains("2148916233"));
+        assert!(message.contains("https://start.ui.xboxlive.com/CreateAccount"));
     }
 
     #[test]
