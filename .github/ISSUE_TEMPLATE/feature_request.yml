@@ -1,0 +1,16 @@
+name: 功能建议
+description: 希望启动器增加或改进的功能
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 想解决什么问题
+      description: 描述你的使用场景，以及现在哪里不方便。
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 期望的做法
+      description: 你希望它怎么工作；如果其他启动器有类似功能，也可以写出来参考。
